@@ -1,248 +1,808 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>DSA Pattern Practice Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Pattern Practice Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --card-hover-bg: rgba(255, 255, 255, 0.1);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6;
+            --easy-color: #10b981;
+            --medium-color: #f59e0b;
+            --hard-color: #ef4444;
+        }
 
-<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Segoe UI, Arial;
-}
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
 
-body{
-background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-color:white;
-min-height:100vh;
-}
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
 
-header{
-text-align:center;
-padding:40px 20px;
-}
+        header {
+            text-align: center;
+            padding: 4rem 0 3rem;
+            position: relative;
+        }
 
-header h1{
-font-size:42px;
-margin-bottom:10px;
-}
+        .header-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: var(--accent-color);
+            filter: blur(150px);
+            opacity: 0.2;
+            z-index: 0;
+            pointer-events: none;
+        }
 
-header p{
-opacity:0.8;
-}
+        header h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            z-index: 1;
+        }
 
-.section{
-max-width:1100px;
-margin:auto;
-padding:30px;
-}
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+        }
 
-.section h2{
-margin-bottom:20px;
-font-size:28px;
-border-left:6px solid #4caf50;
-padding-left:12px;
-}
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:22px;
-}
+        .search-bar {
+            flex-grow: 1;
+            max-width: 500px;
+            position: relative;
+        }
 
-.card{
-background:white;
-color:#333;
-padding:22px;
-border-radius:14px;
-text-decoration:none;
-box-shadow:0 8px 20px rgba(0,0,0,0.25);
-transition:0.25s;
-position:relative;
-}
+        .search-bar input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
 
-.card:hover{
-transform:translateY(-6px);
-box-shadow:0 12px 28px rgba(0,0,0,0.35);
-}
+        .search-bar input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
 
-.card h3{
-font-size:17px;
-margin-bottom:6px;
-}
+        .search-bar i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
 
-.tag{
-font-size:12px;
-color:#666;
-}
+        .filters {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
 
-.badge{
-position:absolute;
-top:12px;
-right:12px;
-background:#4caf50;
-color:white;
-padding:3px 9px;
-border-radius:8px;
-font-size:11px;
-}
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
 
-footer{
-text-align:center;
-padding:30px;
-opacity:0.6;
-}
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
 
-</style>
+        /* Group Sections */
+        .topic-group {
+            margin-bottom: 4rem;
+        }
 
+        .topic-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .topic-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .topic-header .topic-icon {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            background: rgba(59, 130, 246, 0.1);
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .topic-header .topic-count {
+            margin-left: auto;
+            background: var(--card-bg);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: white;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: var(--card-hover-bg);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .global-progress {
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--easy-color);
+        }
+
+        .progress-bar-container {
+            max-width: 400px;
+            margin: 1rem auto 0;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: var(--easy-color);
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .check-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            margin-left: 1rem;
+            z-index: 2;
+        }
+
+        .check-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .card.completed {
+            opacity: 0.8;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .card.completed .check-btn {
+            background: var(--easy-color);
+            border-color: var(--easy-color);
+            color: white;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .card.completed::before {
+            background: var(--easy-color);
+        }
+
+        .card.completed h3 {
+            text-decoration: line-through;
+            color: var(--text-secondary);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-difficulty {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .badge-difficulty.easy {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--easy-color);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-difficulty.medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--medium-color);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-difficulty.hard {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--hard-color);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topic-tag {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.2s ease;
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .card:hover .action-icon {
+            opacity: 1;
+            transform: translateX(0);
+            background: var(--accent-color);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+            display: none;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--card-border);
+            margin-top: 2rem;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-gradient);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-bar {
+                max-width: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<header>
-<h1>DSA Pattern Practice</h1>
-<p>LeetCode Pattern Tracker – Sliding Window & Heap</p>
-</header>
+    <div class="container">
+        <header>
+            <div class="header-bg"></div>
+            <h1>DSA Pattern Practice</h1>
+            <p>Master Algorithms through Pattern Recognition</p>
+            <div class="global-progress" id="globalProgress">0 / 0 Completed (0%)</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+        </header>
 
+        <div class="controls">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search problems (e.g. 'Maximum Points', 'Tree')...">
+            </div>
+            <div class="filters" id="difficultyFilters">
+                <button class="filter-btn active" data-filter="all">All Difficulties</button>
+                <button class="filter-btn" data-filter="Easy">Easy</button>
+                <button class="filter-btn" data-filter="Medium">Medium</button>
+                <button class="filter-btn" data-filter="Hard">Hard</button>
+            </div>
+        </div>
 
-<!-- Sliding Window Section -->
+        <div id="content">
+            <!-- Problem groups will be injected here -->
+        </div>
 
-<div class="section">
+        <div class="empty-state" id="emptyState">
+            <i class="fas fa-search"></i>
+            <h3>No problems found</h3>
+            <p>Try adjusting your search or filters.</p>
+        </div>
 
-<h2>Two Pointers / Sliding Window</h2>
+        <footer>
+            <p>Personal DSA Practice Dashboard • Built for mastery.</p>
+        </footer>
+    </div>
 
-<div class="grid">
+    <script>
+        // Define all topics, icons and problems
+        const topicMetadata = {
+            "Arrays & Matrix": { icon: "fa-table", color: "#3b82f6" },
+            "Binary Search": { icon: "fa-magnifying-glass-plus", color: "#14b8a6" },
+            "String": { icon: "fa-font", color: "#f97316" },
+            "Linked List": { icon: "fa-link", color: "#84cc16" },
+            "Recursion & Backtracking": { icon: "fa-code-branch", color: "#0ea5e9" },
+            "Bit Manipulation": { icon: "fa-microchip", color: "#f43f5e" },
+            "Stack & Queue": { icon: "fa-layer-group", color: "#f59e0b" },
+            "Sliding Window": { icon: "fa-sliders", color: "#8b5cf6" },
+            "Two Pointers": { icon: "fa-arrows-left-right", color: "#ec4899" },
+            "Heap / Priority Queue": { icon: "fa-sort-amount-down", color: "#ef4444" },
+            "Greedy Algorithms": { icon: "fa-coins", color: "#eab308" },
+            "Trees": { icon: "fa-sitemap", color: "#10b981" },
+            "Binary Search Tree": { icon: "fa-tree", color: "#4ade80" },
+            "Graphs": { icon: "fa-project-diagram", color: "#6366f1" },
+            "Dynamic Programming": { icon: "fa-brain", color: "#d946ef" }
+        };
 
-<a class="card" href="https://leetcode.com/problems/max-consecutive-ones-iii/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Max Consecutive Ones III</h3>
-<div class="tag">Sliding Window</div>
-</a>
+        const problems = [
+            // Arrays & Matrix
+            { title: "Check if Array Is Sorted and Rotated", difficulty: "Easy", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/check-if-array-is-sorted-and-rotated/description/" },
+            { title: "Remove Duplicates from Sorted Array", difficulty: "Easy", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/remove-duplicates-from-sorted-array/description/" },
+            { title: "Rotate Array", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/rotate-array/description/" },
+            { title: "Move Zeroes", difficulty: "Easy", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/move-zeroes/description/" },
+            { title: "Max Consecutive Ones", difficulty: "Easy", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/max-consecutive-ones/description/" },
+            { title: "Single Number", difficulty: "Easy", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/single-number/description/" },
+            { title: "Two Sum", difficulty: "Easy", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/two-sum/description/" },
+            { title: "Sort Colors", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/sort-colors/description/" },
+            { title: "Majority Element", difficulty: "Easy", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/majority-element/description/" },
+            { title: "Maximum Subarray", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/maximum-subarray/description/" },
+            { title: "Best Time to Buy and Sell Stock", difficulty: "Easy", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/description/" },
+            { title: "Rearrange Array Elements by Sign", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/rearrange-array-elements-by-sign/description/" },
+            { title: "Longest Consecutive Sequence", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/longest-consecutive-sequence/editorial/" },
+            { title: "Majority Element II", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/majority-element-ii/description/" },
+            { title: "3Sum", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/3sum/description/" },
+            { title: "Merge Intervals", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/merge-intervals/description/" },
+            { title: "Merge Sorted Array", difficulty: "Easy", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/merge-sorted-array/description/" },
+            { title: "Maximum Product Subarray", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/maximum-product-subarray/description/" },
+            { title: "Maximal Rectangle", difficulty: "Hard", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/maximal-rectangle/description/" },
+            { title: "Set Matrix Zeroes", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/set-matrix-zeroes/description/" },
+            { title: "Rotate Image", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/rotate-image/description/" },
+            { title: "Spiral Matrix", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/spiral-matrix/description/" },
+            { title: "Subarray Sum Equals K", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/subarray-sum-equals-k/description/" },
+            { title: "Pascal's Triangle", difficulty: "Easy", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/pascals-triangle/description/" },
+            { title: "4Sum", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/4sum/description/" },
+            { title: "Reverse Pairs", difficulty: "Hard", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/reverse-pairs/description/" },
+            { title: "Next Permutation", difficulty: "Medium", topic: "Arrays & Matrix", url: "https://leetcode.com/problems/next-permutation/description/" },
 
-<a class="card" href="https://leetcode.com/problems/longest-substring-without-repeating-characters/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Longest Substring Without Repeating Characters</h3>
-<div class="tag">Classic Window</div>
-</a>
+            // Sliding Window
+            { title: "Max Consecutive Ones III", difficulty: "Medium", topic: "Sliding Window", url: "https://leetcode.com/problems/max-consecutive-ones-iii/description/" },
+            { title: "Longest Substring Without Repeating Characters", difficulty: "Medium", topic: "Sliding Window", url: "https://leetcode.com/problems/longest-substring-without-repeating-characters/description/" },
+            { title: "Longest Repeating Character Replacement", difficulty: "Medium", topic: "Sliding Window", url: "https://leetcode.com/problems/longest-repeating-character-replacement/description/" },
+            { title: "Binary Subarrays With Sum", difficulty: "Medium", topic: "Sliding Window", url: "https://leetcode.com/problems/binary-subarrays-with-sum/description/" },
+            { title: "Count Number of Nice Subarrays", difficulty: "Medium", topic: "Sliding Window", url: "https://leetcode.com/problems/count-number-of-nice-subarrays/description/" },
+            { title: "Number of Substrings Containing All Three Characters", difficulty: "Medium", topic: "Sliding Window", url: "https://leetcode.com/problems/number-of-substrings-containing-all-three-characters/description/" },
+            { title: "Maximum Points You Can Obtain From Cards", difficulty: "Medium", topic: "Sliding Window", url: "https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/description/" },
+            { title: "Subarrays With K Different Integers", difficulty: "Hard", topic: "Sliding Window", url: "https://leetcode.com/problems/subarrays-with-k-different-integers/description/" },
+            { title: "Minimum Window Substring", difficulty: "Hard", topic: "Sliding Window", url: "https://leetcode.com/problems/minimum-window-substring/description/" },
 
-<a class="card" href="https://leetcode.com/problems/longest-repeating-character-replacement/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Longest Repeating Character Replacement</h3>
-<div class="tag">Window Optimization</div>
-</a>
+            // Binary Search
+            { title: "Binary Search", difficulty: "Easy", topic: "Binary Search", url: "https://leetcode.com/problems/binary-search/description/" },
+            { title: "Search Insert Position", difficulty: "Easy", topic: "Binary Search", url: "https://leetcode.com/problems/search-insert-position/description/" },
+            { title: "Find First and Last Position of Element in Sorted Array", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/description/" },
+            { title: "Search in Rotated Sorted Array", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/search-in-rotated-sorted-array/description/" },
+            { title: "Find Minimum in Rotated Sorted Array", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/description/" },
+            { title: "Kth Missing Positive Number", difficulty: "Easy", topic: "Binary Search", url: "https://leetcode.com/problems/kth-missing-positive-number/description/" },
+            { title: "Split Array Largest Sum", difficulty: "Hard", topic: "Binary Search", url: "https://leetcode.com/problems/split-array-largest-sum/description/" },
+            { title: "Minimize Max Distance to Gas Station", difficulty: "Hard", topic: "Binary Search", url: "https://leetcode.com/problems/minimize-max-distance-to-gas-station/description/" },
+            { title: "Median of Two Sorted Arrays", difficulty: "Hard", topic: "Binary Search", url: "https://leetcode.com/problems/median-of-two-sorted-arrays/description/" },
+            { title: "Search a 2D Matrix", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/search-a-2d-matrix/description/" },
+            { title: "Search a 2D Matrix II", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/search-a-2d-matrix-ii/description/" },
+            { title: "Find a Peak Element II", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/find-a-peak-element-ii/description/" },
+            { title: "Search in Rotated Sorted Array II", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/search-in-rotated-sorted-array-ii/description/" },
+            { title: "Single Element in a Sorted Array", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/single-element-in-a-sorted-array/description/" },
+            { title: "Find Peak Element", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/find-peak-element/description/" },
+            { title: "Koko Eating Bananas", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/koko-eating-bananas/description/" },
+            { title: "Minimum Number of Days to Make m Bouquets", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/description/" },
+            { title: "Find the Smallest Divisor Given a Threshold", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/find-the-smallest-divisor-given-a-threshold/description/" },
+            { title: "Capacity To Ship Packages Within D Days", difficulty: "Medium", topic: "Binary Search", url: "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/description/" },
 
-<a class="card" href="https://leetcode.com/problems/binary-subarrays-with-sum/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Binary Subarrays With Sum</h3>
-<div class="tag">Prefix + Window</div>
-</a>
+            // Stack & Queue
+            { title: "Implement Stack using Queues", difficulty: "Easy", topic: "Stack & Queue", url: "https://leetcode.com/problems/implement-stack-using-queues/description/" },
+            { title: "Implement Queue using Stacks", difficulty: "Easy", topic: "Stack & Queue", url: "https://leetcode.com/problems/implement-queue-using-stacks/description/" },
+            { title: "Valid Parentheses", difficulty: "Easy", topic: "Stack & Queue", url: "https://leetcode.com/problems/valid-parentheses/description/" },
+            { title: "Min Stack", difficulty: "Medium", topic: "Stack & Queue", url: "https://leetcode.com/problems/min-stack/description/" },
+            { title: "Next Greater Element I", difficulty: "Easy", topic: "Stack & Queue", url: "https://leetcode.com/problems/next-greater-element-i/description/" },
+            { title: "Next Greater Element II", difficulty: "Medium", topic: "Stack & Queue", url: "https://leetcode.com/problems/next-greater-element-ii/description/" },
+            { title: "Trapping Rain Water", difficulty: "Hard", topic: "Stack & Queue", url: "https://leetcode.com/problems/trapping-rain-water/description/" },
+            { title: "Asteroid Collision", difficulty: "Medium", topic: "Stack & Queue", url: "https://leetcode.com/problems/asteroid-collision/description/" },
+            { title: "Sum of Subarray Ranges", difficulty: "Medium", topic: "Stack & Queue", url: "https://leetcode.com/problems/sum-of-subarray-ranges/description/" },
+            { title: "Remove K Digits", difficulty: "Medium", topic: "Stack & Queue", url: "https://leetcode.com/problems/remove-k-digits/description/" },
+            { title: "Largest Rectangle in Histogram", difficulty: "Hard", topic: "Stack & Queue", url: "https://leetcode.com/problems/largest-rectangle-in-histogram/description/" },
+            { title: "Sliding Window Maximum", difficulty: "Hard", topic: "Stack & Queue", url: "https://leetcode.com/problems/sliding-window-maximum/description/" },
+            { title: "Number of Visible People in a Queue", difficulty: "Hard", topic: "Stack & Queue", url: "https://leetcode.com/problems/number-of-visible-people-in-a-queue/description/" },
+            { title: "Time Needed to Buy Tickets", difficulty: "Easy", topic: "Stack & Queue", url: "https://leetcode.com/problems/time-needed-to-buy-tickets/description/" },
+            { title: "Number of Recent Calls", difficulty: "Easy", topic: "Stack & Queue", url: "https://leetcode.com/problems/number-of-recent-calls/description/" },
+            { title: "LRU Cache", difficulty: "Medium", topic: "Stack & Queue", url: "https://leetcode.com/problems/lru-cache/description/" },
+            { title: "LFU Cache", difficulty: "Hard", topic: "Stack & Queue", url: "https://leetcode.com/problems/lfu-cache/description/" },
+            { title: "Online Stock Span", difficulty: "Medium", topic: "Stack & Queue", url: "https://leetcode.com/problems/online-stock-span/description/" },
 
-<a class="card" href="https://leetcode.com/problems/count-number-of-nice-subarrays/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Count Number of Nice Subarrays</h3>
-<div class="tag">Sliding Window</div>
-</a>
+            // Heap / Priority Queue
+            { title: "Merge K Sorted Lists", difficulty: "Hard", topic: "Heap / Priority Queue", url: "https://leetcode.com/problems/merge-k-sorted-lists/description/" },
+            { title: "Task Scheduler", difficulty: "Medium", topic: "Heap / Priority Queue", url: "https://leetcode.com/problems/task-scheduler/description/" },
+            { title: "Hand of Straights", difficulty: "Medium", topic: "Heap / Priority Queue", url: "https://leetcode.com/problems/hand-of-straights/description/" },
+            { title: "Design Twitter", difficulty: "Medium", topic: "Heap / Priority Queue", url: "https://leetcode.com/problems/design-twitter/description/" },
+            { title: "Kth Largest Element in a Stream", difficulty: "Easy", topic: "Heap / Priority Queue", url: "https://leetcode.com/problems/kth-largest-element-in-a-stream/description/" },
+            { title: "Find Median From Data Stream", difficulty: "Hard", topic: "Heap / Priority Queue", url: "https://leetcode.com/problems/find-median-from-data-stream/description/" },
+            { title: "Top K Frequent Elements", difficulty: "Medium", topic: "Heap / Priority Queue", url: "https://leetcode.com/problems/top-k-frequent-elements/description/" },
+            { title: "Kth Largest Element in an Array", difficulty: "Medium", topic: "Heap / Priority Queue", url: "https://leetcode.com/problems/kth-largest-element-in-an-array/description/" },
+            { title: "Sort an Array", difficulty: "Medium", topic: "Heap / Priority Queue", url: "https://leetcode.com/problems/sort-an-array/description/" },
 
-<a class="card" href="https://leetcode.com/problems/number-of-substrings-containing-all-three-characters/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Number of Substrings Containing All Three Characters</h3>
-<div class="tag">Sliding Window</div>
-</a>
+            // Trees
+            { title: "Binary Tree Maximum Path Sum", difficulty: "Hard", topic: "Trees", url: "https://leetcode.com/problems/binary-tree-maximum-path-sum/description/" },
+            { title: "Construct Binary Tree from Preorder and Inorder Traversal", difficulty: "Medium", topic: "Trees", url: "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/description/" },
+            { title: "Binary Tree Cameras", difficulty: "Hard", topic: "Trees", url: "https://leetcode.com/problems/binary-tree-cameras/description/" },
+            { title: "Binary Tree Level Order Traversal", difficulty: "Medium", topic: "Trees", url: "https://leetcode.com/problems/binary-tree-level-order-traversal/description/" },
+            { title: "N-ary Tree Level Order Traversal", difficulty: "Medium", topic: "Trees", url: "https://leetcode.com/problems/n-ary-tree-level-order-traversal/description/" },
 
-<a class="card" href="https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Maximum Points You Can Obtain From Cards</h3>
-<div class="tag">Window From Ends</div>
-</a>
+            // Graphs
+            { title: "Number of Islands", difficulty: "Medium", topic: "Graphs", url: "https://leetcode.com/problems/number-of-islands/description/" },
+            { title: "Is Graph Bipartite?", difficulty: "Medium", topic: "Graphs", url: "https://leetcode.com/problems/is-graph-bipartite/description/" },
+            { title: "Possible Bipartition", difficulty: "Medium", topic: "Graphs", url: "https://leetcode.com/problems/possible-bipartition/description/" },
+            { title: "Course Schedule II", difficulty: "Medium", topic: "Graphs", url: "https://leetcode.com/problems/course-schedule-ii/description/" },
 
-<a class="card" href="https://leetcode.com/problems/subarrays-with-k-different-integers/description/" target="_blank">
-<div class="badge">Hard</div>
-<h3>Subarrays With K Different Integers</h3>
-<div class="tag">Advanced Window</div>
-</a>
+            // Dynamic Programming
+            { title: "Coin Change", difficulty: "Medium", topic: "Dynamic Programming", url: "https://leetcode.com/problems/coin-change/" },
+            { title: "Coin Change II", difficulty: "Medium", topic: "Dynamic Programming", url: "https://leetcode.com/problems/coin-change-ii/" },
+            { title: "Edit Distance", difficulty: "Hard", topic: "Dynamic Programming", url: "https://leetcode.com/problems/edit-distance/" },
 
-<a class="card" href="https://leetcode.com/problems/minimum-window-substring/description/" target="_blank">
-<div class="badge">Hard</div>
-<h3>Minimum Window Substring</h3>
-<div class="tag">Classic Hard</div>
-</a>
+            // Bit Manipulation
+            { title: "Distinct Prime Factors of Product of Array", difficulty: "Medium", topic: "Bit Manipulation", url: "https://leetcode.com/problems/distinct-prime-factors-of-product-of-array/description/" },
+            { title: "Count Primes", difficulty: "Medium", topic: "Bit Manipulation", url: "https://leetcode.com/problems/count-primes/description/" },
+            { title: "Minimum Bit Flips to Convert Number", difficulty: "Easy", topic: "Bit Manipulation", url: "https://leetcode.com/problems/minimum-bit-flips-to-convert-number/description/" },
+            { title: "Divide Two Integers", difficulty: "Medium", topic: "Bit Manipulation", url: "https://leetcode.com/problems/divide-two-integers/description/" },
+            { title: "Number of Even and Odd Bits", difficulty: "Easy", topic: "Bit Manipulation", url: "https://leetcode.com/problems/number-of-even-and-odd-bits/description/" },
 
-</div>
-</div>
+            // String
+            { title: "Remove Outermost Parentheses", difficulty: "Easy", topic: "String", url: "https://leetcode.com/problems/remove-outermost-parentheses/description/" },
+            { title: "Reverse Words in a String", difficulty: "Medium", topic: "String", url: "https://leetcode.com/problems/reverse-words-in-a-string/description/" },
+            { title: "Largest Odd Number in String", difficulty: "Easy", topic: "String", url: "https://leetcode.com/problems/largest-odd-number-in-string/description/" },
+            { title: "Longest Common Prefix", difficulty: "Easy", topic: "String", url: "https://leetcode.com/problems/longest-common-prefix/description/" },
+            { title: "Isomorphic Strings", difficulty: "Easy", topic: "String", url: "https://leetcode.com/problems/isomorphic-strings/description/" },
+            { title: "Rotate String", difficulty: "Easy", topic: "String", url: "https://leetcode.com/problems/rotate-string/description/" },
+            { title: "Valid Anagram", difficulty: "Easy", topic: "String", url: "https://leetcode.com/problems/valid-anagram/description/" },
+            { title: "Sort Characters By Frequency", difficulty: "Medium", topic: "String", url: "https://leetcode.com/problems/sort-characters-by-frequency/description/" },
+            { title: "Maximum Nesting Depth of the Parentheses", difficulty: "Easy", topic: "String", url: "https://leetcode.com/problems/maximum-nesting-depth-of-the-parentheses/description/" },
+            { title: "Roman to Integer", difficulty: "Easy", topic: "String", url: "https://leetcode.com/problems/roman-to-integer/description/" },
+            { title: "String to Integer (atoi)", difficulty: "Medium", topic: "String", url: "https://leetcode.com/problems/string-to-integer-atoi/description/" },
+            { title: "Longest Palindromic Substring", difficulty: "Medium", topic: "String", url: "https://leetcode.com/problems/longest-palindromic-substring/description/" },
+            { title: "Sum of Beauty of All Substrings", difficulty: "Medium", topic: "String", url: "https://leetcode.com/problems/sum-of-beauty-of-all-substrings/description/" },
 
+            // Linked List
+            { title: "Delete Node in a Linked List", difficulty: "Medium", topic: "Linked List", url: "https://leetcode.com/problems/delete-node-in-a-linked-list/description/" },
+            { title: "Middle of the Linked List", difficulty: "Easy", topic: "Linked List", url: "https://leetcode.com/problems/middle-of-the-linked-list/description/" },
+            { title: "Reverse Linked List", difficulty: "Easy", topic: "Linked List", url: "https://leetcode.com/problems/reverse-linked-list/description/" },
+            { title: "Linked List Cycle", difficulty: "Easy", topic: "Linked List", url: "https://leetcode.com/problems/linked-list-cycle/description/" },
+            { title: "Linked List Cycle II", difficulty: "Medium", topic: "Linked List", url: "https://leetcode.com/problems/linked-list-cycle-ii/description/" },
+            { title: "Palindrome Linked List", difficulty: "Easy", topic: "Linked List", url: "https://leetcode.com/problems/palindrome-linked-list/description/" },
+            { title: "Odd Even Linked List", difficulty: "Medium", topic: "Linked List", url: "https://leetcode.com/problems/odd-even-linked-list/description/" },
+            { title: "Remove Nth Node From End of List", difficulty: "Medium", topic: "Linked List", url: "https://leetcode.com/problems/remove-nth-node-from-end-of-list/description/" },
+            { title: "Delete the Middle Node of a Linked List", difficulty: "Medium", topic: "Linked List", url: "https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/description/" },
+            { title: "Sort List", difficulty: "Medium", topic: "Linked List", url: "https://leetcode.com/problems/sort-list/description/" },
+            { title: "Intersection of Two Linked Lists", difficulty: "Easy", topic: "Linked List", url: "https://leetcode.com/problems/intersection-of-two-linked-lists/description/" },
+            { title: "Add Two Numbers", difficulty: "Medium", topic: "Linked List", url: "https://leetcode.com/problems/add-two-numbers/description/" },
+            { title: "Reverse Nodes in k-Group", difficulty: "Hard", topic: "Linked List", url: "https://leetcode.com/problems/reverse-nodes-in-k-group/description/" },
+            { title: "Rotate List", difficulty: "Medium", topic: "Linked List", url: "https://leetcode.com/problems/rotate-list/description/" },
+            { title: "Copy List with Random Pointer", difficulty: "Medium", topic: "Linked List", url: "https://leetcode.com/problems/copy-list-with-random-pointer/" },
 
+            // Recursion & Backtracking
+            { title: "Count Good Numbers", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/count-good-numbers/" },
+            { title: "Generate Binary Strings Without Adjacent Zeros", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/generate-binary-strings-without-adjacent-zeros/description/" },
+            { title: "Subsets", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/subsets/description/" },
+            { title: "Generate Parentheses", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/generate-parentheses/description/" },
+            { title: "Number of Subsequences That Satisfy the Given Sum Condition", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/number-of-subsequences-that-satisfy-the-given-sum-condition/description/" },
+            { title: "Combination Sum II", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/combination-sum-ii/description/" },
+            { title: "Subsets II", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/subsets-ii/description/" },
+            { title: "Letter Combinations of a Phone Number", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/letter-combinations-of-a-phone-number/description/" },
+            { title: "Combination Sum III", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/combination-sum-iii/description/" },
+            { title: "Palindrome Partitioning", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/palindrome-partitioning/description/" },
+            { title: "Word Search", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/word-search/description/" },
+            { title: "N-Queens", difficulty: "Hard", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/n-queens/description/" },
+            { title: "Escape a Large Maze", difficulty: "Hard", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/escape-a-large-maze/description/" },
+            { title: "Word Break", difficulty: "Medium", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/word-break/description/" },
+            { title: "Painting a Grid With Three Different Colors", difficulty: "Hard", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/painting-a-grid-with-three-different-colors/description/" },
+            { title: "Sudoku Solver", difficulty: "Hard", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/sudoku-solver/description/" },
+            { title: "Expression Add Operators", difficulty: "Hard", topic: "Recursion & Backtracking", url: "https://leetcode.com/problems/expression-add-operators/description/" }
+        ];
 
-<!-- Heap Section -->
+        const contentDiv = document.getElementById('content');
+        const emptyState = document.getElementById('emptyState');
+        const searchInput = document.getElementById('searchInput');
+        const filterBtns = document.querySelectorAll('.filter-btn');
 
-<div class="section">
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let completedProblems = JSON.parse(localStorage.getItem('dsaTrackerCompleted')) || [];
 
-<h2>Heap / Priority Queue</h2>
+        function toggleComplete(e, title) {
+            e.preventDefault();
+            e.stopPropagation();
 
-<div class="grid">
+            const index = completedProblems.indexOf(title);
+            if (index === -1) {
+                completedProblems.push(title);
+            } else {
+                completedProblems.splice(index, 1);
+            }
 
-<a class="card" href="https://leetcode.com/problems/merge-k-sorted-lists/description/" target="_blank">
-<div class="badge">Hard</div>
-<h3>Merge K Sorted Lists</h3>
-<div class="tag">Min Heap</div>
-</a>
+            localStorage.setItem('dsaTrackerCompleted', JSON.stringify(completedProblems));
+            renderProblems();
+        }
 
-<a class="card" href="https://leetcode.com/problems/task-scheduler/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Task Scheduler</h3>
-<div class="tag">Max Heap</div>
-</a>
+        function renderProblems() {
+            contentDiv.innerHTML = '';
 
-<a class="card" href="https://leetcode.com/problems/hand-of-straights/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Hand of Straights</h3>
-<div class="tag">Heap + Greedy</div>
-</a>
+            // Filter problems
+            const filteredProblems = problems.filter(p => {
+                const matchesSearch = p.title.toLowerCase().includes(searchQuery) ||
+                    p.topic.toLowerCase().includes(searchQuery);
+                const matchesDifficulty = currentFilter === 'all' || p.difficulty === currentFilter;
+                return matchesSearch && matchesDifficulty;
+            });
 
-<a class="card" href="https://leetcode.com/problems/design-twitter/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Design Twitter</h3>
-<div class="tag">Heap + Design</div>
-</a>
+            if (filteredProblems.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
 
-<a class="card" href="https://leetcode.com/problems/kth-largest-element-in-a-stream/description/" target="_blank">
-<div class="badge">Easy</div>
-<h3>Kth Largest Element in a Stream</h3>
-<div class="tag">Min Heap</div>
-</a>
+            emptyState.style.display = 'none';
 
-<a class="card" href="https://leetcode.com/problems/find-median-from-data-stream/description/" target="_blank">
-<div class="badge">Hard</div>
-<h3>Find Median From Data Stream</h3>
-<div class="tag">Two Heaps</div>
-</a>
+            // Group by topic
+            const grouped = filteredProblems.reduce((acc, obj) => {
+                let key = obj.topic;
+                if (!acc[key]) {
+                    acc[key] = [];
+                }
+                acc[key].push(obj);
+                return acc;
+            }, {});
 
-<a class="card" href="https://leetcode.com/problems/top-k-frequent-elements/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Top K Frequent Elements</h3>
-<div class="tag">Heap</div>
-</a>
+            // Define custom order of topics based on metadata or fallback to alphabetical
+            const sortedTopics = Object.keys(topicMetadata).filter(topic => grouped[topic]);
 
-<a class="card" href="https://leetcode.com/problems/kth-largest-element-in-an-array/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Kth Largest Element in an Array</h3>
-<div class="tag">Heap</div>
-</a>
+            // Also append any dynamic topics that might not be in metadata
+            Object.keys(grouped).forEach(topic => {
+                if (!sortedTopics.includes(topic)) sortedTopics.push(topic);
+            });
 
-<a class="card" href="https://leetcode.com/problems/sort-an-array/description/" target="_blank">
-<div class="badge">Medium</div>
-<h3>Sort an Array</h3>
-<div class="tag">Heap Sort</div>
-</a>
+            sortedTopics.forEach(topic => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'topic-group';
 
-</div>
-</div>
+                const meta = topicMetadata[topic] || { icon: 'fa-layer-group', color: 'var(--accent-color)' };
 
+                const completedInTopic = grouped[topic].filter(p => completedProblems.includes(p.title)).length;
 
-<footer>
-Personal DSA Practice Dashboard
-</footer>
+                groupDiv.innerHTML = `
+                    <div class="topic-header">
+                        <div class="topic-icon" style="color: ${meta.color}; background: ${meta.color}15;">
+                            <i class="fas ${meta.icon}"></i>
+                        </div>
+                        <h2>${topic}</h2>
+                        <div class="topic-count">
+                            <span style="color: var(--easy-color); font-weight: 600;">${completedInTopic}</span> / ${grouped[topic].length} items
+                        </div>
+                    </div>
+                    <div class="grid">
+                        ${grouped[topic].map(p => {
+                    const isCompleted = completedProblems.includes(p.title);
+                    return `
+                                <a href="${p.url}" target="_blank" class="card ${isCompleted ? 'completed' : ''}">
+                                    <div class="card-header">
+                                        <div>
+                                            <h3>${p.title}</h3>
+                                            <span class="badge-difficulty ${p.difficulty.toLowerCase()}">${p.difficulty}</span>
+                                        </div>
+                                        <div class="check-btn" onclick="toggleComplete(event, '${p.title.replace(/'/g, "\\'")}')" title="Mark as completed">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <span class="topic-tag"><i class="fas fa-tag"></i> ${p.topic}</span>
+                                        <div class="action-icon">
+                                            <i class="fas fa-arrow-right"></i>
+                                        </div>
+                                    </div>
+                                </a>
+                            `;
+                }).join('')}
+                    </div>
+                `;
+                contentDiv.appendChild(groupDiv);
+            });
 
+            // Update global progress
+            const totalProblems = problems.length;
+            const completedCount = completedProblems.length;
+            const progressPercentage = totalProblems === 0 ? 0 : Math.round((completedCount / totalProblems) * 100);
+
+            document.getElementById('globalProgress').innerText = `${completedCount} / ${totalProblems} Completed (${progressPercentage}%)`;
+            document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            renderProblems();
+        });
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderProblems();
+            });
+        });
+
+        // Initial render
+        renderProblems();
+    </script>
 </body>
+
 </html>
