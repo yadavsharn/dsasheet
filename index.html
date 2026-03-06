@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DSA Pattern Practice Dashboard</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI, Arial;
+}
+
+body{
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+color:white;
+min-height:100vh;
+}
+
+header{
+text-align:center;
+padding:40px 20px;
+}
+
+header h1{
+font-size:42px;
+margin-bottom:10px;
+}
+
+header p{
+opacity:0.8;
+}
+
+.section{
+max-width:1100px;
+margin:auto;
+padding:30px;
+}
+
+.section h2{
+margin-bottom:20px;
+font-size:28px;
+border-left:6px solid #4caf50;
+padding-left:12px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:22px;
+}
+
+.card{
+background:white;
+color:#333;
+padding:22px;
+border-radius:14px;
+text-decoration:none;
+box-shadow:0 8px 20px rgba(0,0,0,0.25);
+transition:0.25s;
+position:relative;
+}
+
+.card:hover{
+transform:translateY(-6px);
+box-shadow:0 12px 28px rgba(0,0,0,0.35);
+}
+
+.card h3{
+font-size:17px;
+margin-bottom:6px;
+}
+
+.tag{
+font-size:12px;
+color:#666;
+}
+
+.badge{
+position:absolute;
+top:12px;
+right:12px;
+background:#4caf50;
+color:white;
+padding:3px 9px;
+border-radius:8px;
+font-size:11px;
+}
+
+footer{
+text-align:center;
+padding:30px;
+opacity:0.6;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<h1>DSA Pattern Practice</h1>
+<p>LeetCode Pattern Tracker – Sliding Window & Heap</p>
+</header>
+
+
+<!-- Sliding Window Section -->
+
+<div class="section">
+
+<h2>Two Pointers / Sliding Window</h2>
+
+<div class="grid">
+
+<a class="card" href="https://leetcode.com/problems/max-consecutive-ones-iii/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Max Consecutive Ones III</h3>
+<div class="tag">Sliding Window</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/longest-substring-without-repeating-characters/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Longest Substring Without Repeating Characters</h3>
+<div class="tag">Classic Window</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/longest-repeating-character-replacement/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Longest Repeating Character Replacement</h3>
+<div class="tag">Window Optimization</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/binary-subarrays-with-sum/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Binary Subarrays With Sum</h3>
+<div class="tag">Prefix + Window</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/count-number-of-nice-subarrays/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Count Number of Nice Subarrays</h3>
+<div class="tag">Sliding Window</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/number-of-substrings-containing-all-three-characters/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Number of Substrings Containing All Three Characters</h3>
+<div class="tag">Sliding Window</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/maximum-points-you-can-obtain-from-cards/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Maximum Points You Can Obtain From Cards</h3>
+<div class="tag">Window From Ends</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/subarrays-with-k-different-integers/description/" target="_blank">
+<div class="badge">Hard</div>
+<h3>Subarrays With K Different Integers</h3>
+<div class="tag">Advanced Window</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/minimum-window-substring/description/" target="_blank">
+<div class="badge">Hard</div>
+<h3>Minimum Window Substring</h3>
+<div class="tag">Classic Hard</div>
+</a>
+
+</div>
+</div>
+
+
+
+<!-- Heap Section -->
+
+<div class="section">
+
+<h2>Heap / Priority Queue</h2>
+
+<div class="grid">
+
+<a class="card" href="https://leetcode.com/problems/merge-k-sorted-lists/description/" target="_blank">
+<div class="badge">Hard</div>
+<h3>Merge K Sorted Lists</h3>
+<div class="tag">Min Heap</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/task-scheduler/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Task Scheduler</h3>
+<div class="tag">Max Heap</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/hand-of-straights/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Hand of Straights</h3>
+<div class="tag">Heap + Greedy</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/design-twitter/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Design Twitter</h3>
+<div class="tag">Heap + Design</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/kth-largest-element-in-a-stream/description/" target="_blank">
+<div class="badge">Easy</div>
+<h3>Kth Largest Element in a Stream</h3>
+<div class="tag">Min Heap</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/find-median-from-data-stream/description/" target="_blank">
+<div class="badge">Hard</div>
+<h3>Find Median From Data Stream</h3>
+<div class="tag">Two Heaps</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/top-k-frequent-elements/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Top K Frequent Elements</h3>
+<div class="tag">Heap</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/kth-largest-element-in-an-array/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Kth Largest Element in an Array</h3>
+<div class="tag">Heap</div>
+</a>
+
+<a class="card" href="https://leetcode.com/problems/sort-an-array/description/" target="_blank">
+<div class="badge">Medium</div>
+<h3>Sort an Array</h3>
+<div class="tag">Heap Sort</div>
+</a>
+
+</div>
+</div>
+
+
+<footer>
+Personal DSA Practice Dashboard
+</footer>
+
+</body>
+</html>
