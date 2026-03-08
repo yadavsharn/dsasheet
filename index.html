@@ -66,6 +66,7 @@
             font-weight: 800;
             margin-bottom: 1rem;
             background: linear-gradient(to right, #60a5fa, #a78bfa);
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             position: relative;
@@ -142,6 +143,135 @@
             background: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
+        }
+
+        /* Animations & Geeky Features */
+        @keyframes glitch {
+
+            2%,
+            64% {
+                transform: translate(2px, 0) skew(0deg);
+            }
+
+            4%,
+            60% {
+                transform: translate(-2px, 0) skew(0deg);
+            }
+
+            62% {
+                transform: translate(0, 0) skew(5deg);
+            }
+        }
+
+        @keyframes typing {
+            from {
+                width: 0
+            }
+
+            to {
+                width: 100%
+            }
+        }
+
+        @keyframes blink-caret {
+
+            from,
+            to {
+                border-color: transparent
+            }
+
+            50% {
+                border-color: var(--accent-color)
+            }
+        }
+
+        .glitch-hover {
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+
+        .glitch-hover:hover {
+            animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: var(--easy-color);
+            text-shadow: 2px 2px var(--accent-color), -2px -2px #ec4899;
+        }
+
+        .typing-container {
+            display: inline-block;
+            overflow: hidden;
+            border-right: .15em solid var(--accent-color);
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .05em;
+            width: fit-content;
+            max-width: 100%;
+            animation:
+                typing 3s steps(40, end),
+                blink-caret .75s step-end infinite;
+        }
+
+        .random-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--accent-color);
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .random-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .random-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        /* Navigation Sections */
+        .topic-navigation {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .topic-nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+
+        .topic-nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .topic-nav-link i {
+            margin-right: 0.5rem;
         }
 
         /* Group Sections */
@@ -444,8 +574,10 @@
     <div class="container">
         <header>
             <div class="header-bg"></div>
-            <h1>DSA Pattern Practice</h1>
-            <p>Master Algorithms through Pattern Recognition</p>
+            <h1 class="glitch-hover">DSA Pattern Practice</h1>
+            <div style="display: flex; justify-content: center; width: 100%; margin-bottom: 1rem;">
+                <p class="typing-container">Master Algorithms through Pattern Recognition</p>
+            </div>
             <div class="global-progress" id="globalProgress">0 / 0 Completed (0%)</div>
             <div class="progress-bar-container">
                 <div class="progress-bar" id="progressBar"></div>
@@ -462,8 +594,13 @@
                 <button class="filter-btn" data-filter="Easy">Easy</button>
                 <button class="filter-btn" data-filter="Medium">Medium</button>
                 <button class="filter-btn" data-filter="Hard">Hard</button>
+                <button class="random-btn" onclick="pickRandomProblem()">
+                    <i class="fas fa-dice"></i> Pick Random
+                </button>
             </div>
         </div>
+
+        <nav id="topicNavigation" class="topic-navigation"></nav>
 
         <div id="content">
             <!-- Problem groups will be injected here -->
@@ -480,6 +617,7 @@
         </footer>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         // Define all topics, icons and problems
         const topicMetadata = {
@@ -674,10 +812,20 @@
         const emptyState = document.getElementById('emptyState');
         const searchInput = document.getElementById('searchInput');
         const filterBtns = document.querySelectorAll('.filter-btn');
+        const topicNav = document.getElementById('topicNavigation');
 
         let currentFilter = 'all';
         let searchQuery = '';
         let completedProblems = JSON.parse(localStorage.getItem('dsaTrackerCompleted')) || [];
+
+        function updateGlobalProgressUI() {
+            const totalProblems = problems.length;
+            const completedCount = completedProblems.length;
+            const progressPercentage = totalProblems === 0 ? 0 : Math.round((completedCount / totalProblems) * 100);
+
+            document.getElementById('globalProgress').innerText = `${completedCount} / ${totalProblems} Completed (${progressPercentage}%)`;
+            document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+        }
 
         function toggleComplete(e, title) {
             e.preventDefault();
@@ -692,6 +840,91 @@
 
             localStorage.setItem('dsaTrackerCompleted', JSON.stringify(completedProblems));
             renderProblems();
+        }
+
+        function markAsCompleteIfOpened(title, el) {
+            const index = completedProblems.indexOf(title);
+            if (index === -1) {
+                completedProblems.push(title);
+                localStorage.setItem('dsaTrackerCompleted', JSON.stringify(completedProblems));
+
+                if (el) {
+                    el.classList.add('completed');
+                    const groupDiv = el.closest('.topic-group');
+                    if (groupDiv) {
+                        const countSpan = groupDiv.querySelector('.topic-count span');
+                        if (countSpan) {
+                            countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                        }
+                    }
+                    updateGlobalProgressUI();
+                }
+
+                // Geeky Confetti Animation
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#10b981', '#3b82f6', '#f59e0b']
+                });
+            }
+        }
+
+        function pickRandomProblem() {
+            const uncompleted = problems.filter(p => !completedProblems.includes(p.title));
+            if (uncompleted.length === 0) {
+                alert("Wow! You've completed all problems! 🚀");
+                confetti({
+                    particleCount: 300,
+                    spread: 120,
+                    origin: { y: 0.5 }
+                });
+                return;
+            }
+
+            // Cool rolling animation before picking
+            const btn = document.querySelector('.random-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Picking...';
+            btn.style.pointerEvents = 'none';
+
+            setTimeout(() => {
+                const random = uncompleted[Math.floor(Math.random() * uncompleted.length)];
+                btn.innerHTML = originalText;
+                btn.style.pointerEvents = 'auto';
+
+                // Set search query to the random problem title
+                searchInput.value = random.title;
+                searchQuery = random.title.toLowerCase();
+
+                // Ensure filter is set to all so it shows up
+                filterBtns.forEach(b => b.classList.remove('active'));
+                const allBtn = document.querySelector('[data-filter="all"]');
+                if (allBtn) allBtn.classList.add('active');
+                currentFilter = 'all';
+
+                renderProblems();
+
+                // Highlight and scroll to it
+                setTimeout(() => {
+                    const cards = document.querySelectorAll('.card');
+                    if (cards.length > 0) {
+                        const targetCard = cards[0];
+                        const yOffset = -100;
+                        const y = targetCard.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+
+                        // Add glow effect temporarily
+                        targetCard.style.transition = "all 0.3s ease";
+                        targetCard.style.boxShadow = "0 0 30px var(--accent-color)";
+                        targetCard.style.borderColor = "var(--accent-color)";
+                        setTimeout(() => {
+                            targetCard.style.boxShadow = "";
+                            targetCard.style.borderColor = "";
+                        }, 2000);
+                    }
+                }, 100);
+            }, 600);
         }
 
         function renderProblems() {
@@ -730,9 +963,37 @@
                 if (!sortedTopics.includes(topic)) sortedTopics.push(topic);
             });
 
+            topicNav.innerHTML = '';
+            if (sortedTopics.length > 0) {
+                topicNav.style.display = 'flex';
+                sortedTopics.forEach(topic => {
+                    const topicId = 'topic-' + topic.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+                    const meta = topicMetadata[topic] || { icon: 'fa-layer-group', color: 'var(--accent-color)' };
+
+                    const navLink = document.createElement('a');
+                    navLink.href = '#' + topicId;
+                    navLink.className = 'topic-nav-link';
+                    navLink.innerHTML = `<i class="fas ${meta.icon}" style="color: ${meta.color};"></i>${topic}`;
+
+                    navLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const target = document.getElementById(topicId);
+                        if (target) {
+                            const yOffset = -20;
+                            const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                            window.scrollTo({ top: y, behavior: 'smooth' });
+                        }
+                    });
+                    topicNav.appendChild(navLink);
+                });
+            } else {
+                topicNav.style.display = 'none';
+            }
+
             sortedTopics.forEach(topic => {
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'topic-group';
+                groupDiv.id = 'topic-' + topic.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
 
                 const meta = topicMetadata[topic] || { icon: 'fa-layer-group', color: 'var(--accent-color)' };
 
@@ -752,7 +1013,7 @@
                         ${grouped[topic].map(p => {
                     const isCompleted = completedProblems.includes(p.title);
                     return `
-                                <a href="${p.url}" target="_blank" class="card ${isCompleted ? 'completed' : ''}">
+                                <a href="${p.url}" target="_blank" class="card ${isCompleted ? 'completed' : ''}" onclick="markAsCompleteIfOpened('${p.title.replace(/'/g, "\\'")}', this)">
                                     <div class="card-header">
                                         <div>
                                             <h3>${p.title}</h3>
@@ -777,12 +1038,7 @@
             });
 
             // Update global progress
-            const totalProblems = problems.length;
-            const completedCount = completedProblems.length;
-            const progressPercentage = totalProblems === 0 ? 0 : Math.round((completedCount / totalProblems) * 100);
-
-            document.getElementById('globalProgress').innerText = `${completedCount} / ${totalProblems} Completed (${progressPercentage}%)`;
-            document.getElementById('progressBar').style.width = `${progressPercentage}%`;
+            updateGlobalProgressUI();
         }
 
         // Event Listeners
