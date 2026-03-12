@@ -411,6 +411,16 @@
             border-color: rgba(255, 255, 255, 0.3);
         }
 
+        .card.in-progress {
+            border-color: var(--medium-color);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
+        }
+
+        .card.in-progress::before {
+            background: var(--medium-color);
+            transform: scaleX(1);
+        }
+
         .card.completed {
             opacity: 0.8;
             background: rgba(16, 185, 129, 0.05);
@@ -817,6 +827,7 @@
         let currentFilter = 'all';
         let searchQuery = '';
         let completedProblems = JSON.parse(localStorage.getItem('dsaTrackerCompleted')) || [];
+        let inProgressProblems = JSON.parse(localStorage.getItem('dsaTrackerInProgress')) || [];
 
         function updateGlobalProgressUI() {
             const totalProblems = problems.length;
@@ -834,30 +845,12 @@
             const index = completedProblems.indexOf(title);
             if (index === -1) {
                 completedProblems.push(title);
-            } else {
-                completedProblems.splice(index, 1);
-            }
 
-            localStorage.setItem('dsaTrackerCompleted', JSON.stringify(completedProblems));
-            renderProblems();
-        }
-
-        function markAsCompleteIfOpened(title, el) {
-            const index = completedProblems.indexOf(title);
-            if (index === -1) {
-                completedProblems.push(title);
-                localStorage.setItem('dsaTrackerCompleted', JSON.stringify(completedProblems));
-
-                if (el) {
-                    el.classList.add('completed');
-                    const groupDiv = el.closest('.topic-group');
-                    if (groupDiv) {
-                        const countSpan = groupDiv.querySelector('.topic-count span');
-                        if (countSpan) {
-                            countSpan.innerText = parseInt(countSpan.innerText) + 1;
-                        }
-                    }
-                    updateGlobalProgressUI();
+                // Remove from in-progress if completed
+                const progressIndex = inProgressProblems.indexOf(title);
+                if (progressIndex !== -1) {
+                    inProgressProblems.splice(progressIndex, 1);
+                    localStorage.setItem('dsaTrackerInProgress', JSON.stringify(inProgressProblems));
                 }
 
                 // Geeky Confetti Animation
@@ -867,6 +860,22 @@
                     origin: { y: 0.6 },
                     colors: ['#10b981', '#3b82f6', '#f59e0b']
                 });
+            } else {
+                completedProblems.splice(index, 1);
+            }
+
+            localStorage.setItem('dsaTrackerCompleted', JSON.stringify(completedProblems));
+            renderProblems();
+        }
+
+        function markAsInProgressIfOpened(title, el) {
+            if (completedProblems.includes(title)) return;
+
+            const index = inProgressProblems.indexOf(title);
+            if (index === -1) {
+                inProgressProblems.push(title);
+                localStorage.setItem('dsaTrackerInProgress', JSON.stringify(inProgressProblems));
+                renderProblems();
             }
         }
 
@@ -963,9 +972,32 @@
                 if (!sortedTopics.includes(topic)) sortedTopics.push(topic);
             });
 
+            // Get In Progress Problems
+            const inProgressList = problems.filter(p => inProgressProblems.includes(p.title) && !completedProblems.includes(p.title) && filteredProblems.includes(p));
+
             topicNav.innerHTML = '';
-            if (sortedTopics.length > 0) {
+            if (sortedTopics.length > 0 || inProgressList.length > 0) {
                 topicNav.style.display = 'flex';
+
+                // Add In Progress to Topic Nav
+                if (inProgressList.length > 0) {
+                    const navLink = document.createElement('a');
+                    navLink.href = '#topic-in-progress';
+                    navLink.className = 'topic-nav-link';
+                    navLink.innerHTML = `<i class="fas fa-spinner fa-spin" style="color: var(--medium-color); margin-right: 0.5rem;"></i>In Progress`;
+
+                    navLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const target = document.getElementById('topic-in-progress');
+                        if (target) {
+                            const yOffset = -20;
+                            const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                            window.scrollTo({ top: y, behavior: 'smooth' });
+                        }
+                    });
+                    topicNav.appendChild(navLink);
+                }
+
                 sortedTopics.forEach(topic => {
                     const topicId = 'topic-' + topic.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
                     const meta = topicMetadata[topic] || { icon: 'fa-layer-group', color: 'var(--accent-color)' };
@@ -990,6 +1022,49 @@
                 topicNav.style.display = 'none';
             }
 
+            // Render In Progress section if any
+            if (inProgressList.length > 0) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'topic-group';
+                groupDiv.id = 'topic-in-progress';
+
+                groupDiv.innerHTML = `
+                    <div class="topic-header">
+                        <div class="topic-icon" style="color: var(--medium-color); background: rgba(245, 158, 11, 0.1);">
+                            <i class="fas fa-spinner fa-spin"></i>
+                        </div>
+                        <h2>In Progress</h2>
+                        <div class="topic-count">
+                            <span style="color: var(--medium-color); font-weight: 600;">${inProgressList.length}</span> items
+                        </div>
+                    </div>
+                    <div class="grid">
+                        ${inProgressList.map(p => {
+                    return `
+                                <a href="${p.url}" target="_blank" class="card in-progress" onclick="markAsInProgressIfOpened('${p.title.replace(/'/g, "\\'")}', this)">
+                                    <div class="card-header">
+                                        <div>
+                                            <h3>${p.title}</h3>
+                                            <span class="badge-difficulty ${p.difficulty.toLowerCase()}">${p.difficulty}</span>
+                                        </div>
+                                        <div class="check-btn" onclick="toggleComplete(event, '${p.title.replace(/'/g, "\\'")}')" title="Mark as completed">
+                                            <i class="fas fa-check"></i>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <span class="topic-tag"><i class="fas fa-tag"></i> ${p.topic}</span>
+                                        <div class="action-icon">
+                                            <i class="fas fa-arrow-right"></i>
+                                        </div>
+                                    </div>
+                                </a>
+                            `;
+                }).join('')}
+                    </div>
+                `;
+                contentDiv.appendChild(groupDiv);
+            }
+
             sortedTopics.forEach(topic => {
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'topic-group';
@@ -1012,8 +1087,9 @@
                     <div class="grid">
                         ${grouped[topic].map(p => {
                     const isCompleted = completedProblems.includes(p.title);
+                    const isInProgress = inProgressProblems.includes(p.title) && !isCompleted;
                     return `
-                                <a href="${p.url}" target="_blank" class="card ${isCompleted ? 'completed' : ''}" onclick="markAsCompleteIfOpened('${p.title.replace(/'/g, "\\'")}', this)">
+                                <a href="${p.url}" target="_blank" class="card ${isCompleted ? 'completed' : (isInProgress ? 'in-progress' : '')}" onclick="markAsInProgressIfOpened('${p.title.replace(/'/g, "\\'")}', this)">
                                     <div class="card-header">
                                         <div>
                                             <h3>${p.title}</h3>
